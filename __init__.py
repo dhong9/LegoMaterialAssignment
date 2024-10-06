@@ -1,8 +1,5 @@
 # Builtin Modules
 import bpy
-import bmesh
-import math
-import mathutils
 import csv
 import os
 
