@@ -1,7 +1,5 @@
 # Builtin Modules
 import bpy
-import csv
-import os
 
 bl_info = {
     "name": "Lego Material Assignment",
@@ -24,18 +22,15 @@ class LegoMaterialAssignmentOperator(bpy.types.Operator):
 
     def assign_lego_material(self, context):
         
-        inputName = os.path.join(bpy.path.abspath("//"), "legoColors.csv")
-        
-        # Check if the file exists before trying to open it
-        if not os.path.exists(inputName):
-            self.report({'WARNING'}, f"File not found: {inputName}")
-            print(f"File not found: {inputName}")
-            return
-        
-        # Read input file into a dictionary
-        with open(inputName, mode='r') as infile:
-            reader = csv.reader(infile)
-            colorMap = {rows[0]:rows[1] for rows in reader}
+        colorMap = {
+            "SOLID-LIME": 0xBBE90B,
+            "SOLID-CORAL": 0xFF698F,
+            "SOLID-BRIGHT_LIGHT_ORANGE": 0xF8BB3D,
+            "SOLID-BRIGHT_LIGHT_YELLOW": 0xEBD800,
+            "SOLID-BLACK": 0x051301,
+            "SOLID-MEDIUM_AZURE": 0x36AEBF,
+            "SOLID-LIGHT_BLUISH_GRAY": 0xAFB5C7
+        }
         
         obj = context.active_object
         for idx, material in enumerate(obj.data.materials):
@@ -44,7 +39,7 @@ class LegoMaterialAssignmentOperator(bpy.types.Operator):
                 print("Found material", material.name)
                 
                 hex_color = colorMap[matName]
-                base_color = self.hex_to_rgba(hex_color)
+                base_color = self.hex_to_rgb(hex_color)
                 
                 # Define principled shader
                 material.use_nodes = True
@@ -64,23 +59,12 @@ class LegoMaterialAssignmentOperator(bpy.types.Operator):
             return c / 12.92
         return ((c + 0.055) / 1.055) ** 2.4
 
-    def hex_to_rgba(self, hex_string):
-        # Remove the '#' character if present
-        hex_string = hex_string.lstrip('#')
-        
-        # Parse the hex string into RGB values
-        if len(hex_string) == 6:  # Format: RRGGBB
-            r = int(hex_string[0:2], 16)
-            g = int(hex_string[2:4], 16)
-            b = int(hex_string[4:6], 16)
-            return tuple(self.srgb_to_linearrgb(c / 255.0) for c in (r, g, b)) + (1.0,)  # Default alpha to 1.0
-        if len(hex_string) == 8:  # Format: RRGGBBAA
-            r = int(hex_string[0:2], 16)
-            g = int(hex_string[2:4], 16)
-            b = int(hex_string[4:6], 16)
-            a = int(hex_string[6:8], 16) / 255.0
-            return tuple(self.srgb_to_linearrgb(c / 255.0) for c in (r, g, b)) + (a,)
-        raise ValueError("Invalid hex format. Use #RRGGBB or #RRGGBBAA.")
+    
+    def hex_to_rgb(self, h, alpha=1):
+        r = (h & 0xff0000) >> 16
+        g = (h & 0x00ff00) >> 8
+        b = (h & 0x0000ff)
+        return tuple([self.srgb_to_linearrgb(c/0xff) for c in (r,g,b)] + [alpha])
 
 def draw_mesh_context_menu(self, context):
     layout = self.layout
