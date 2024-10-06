@@ -16,3 +16,9 @@ You will see that your addon has installed and is automatically enabled.
 
 ## Usage
 This addon assumes that your materials have a valid lego color name, such as `SOLID-BLACK`. They may contain a dot and anything after them such as `SOLID-BLACK.001`. To make your materials look like Lego, right click on your object in Object mode, and then select "Assign Lego Materials" from the object context menu.
+
+![Assign material option](./screenshots/contextMenu.png)
+
+Under the Materials tab, you will find that the material is edited for you.
+
+![Assign material option](./screenshots/materialSet.png)
